@@ -25,4 +25,5 @@ void train_mf_model(MF_Model *model, Transaction *transactions, int num_transact
 float predict_mf(MF_Model *model, int user_id, int item_id);
 float **generate_full_matrix(MF_Model *model);
 void predict_all_mf(float **full_matrix, Transaction *test_data, int num_test, float *predictions);
+void evaluate_mf(Transaction *test_data, int num_test, float *predictions, float *rmse, float *mae);
 #endif

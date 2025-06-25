@@ -106,3 +106,16 @@ void predict_all_mf(float **full_matrix, Transaction *test_data, int num_test, f
         predictions[t] = full_matrix[i][j];
     }
 }
+
+
+
+void evaluate_mf(Transaction *test_data, int num_test, float *predictions, float *rmse, float *mae) {
+    float sum_se = 0, sum_ae = 0;
+    for (int t = 0; t < num_test; t++) {
+        float error = test_data[t].rating - predictions[t];
+        sum_se += error * error;
+        sum_ae += fabs(error);
+    }
+    *rmse = sqrt(sum_se / num_test);
+    *mae = sum_ae / num_test;
+}
