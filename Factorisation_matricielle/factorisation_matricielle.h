@@ -19,4 +19,6 @@ typedef struct {
     float lambda;    
     int num_epochs;
 } MF_Params;
+
+void initialize_mf_model(MF_Model *model, int m, int n, int k);
 #endif
