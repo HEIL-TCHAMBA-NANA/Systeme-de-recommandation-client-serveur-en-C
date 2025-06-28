@@ -21,6 +21,7 @@ typedef struct {
 } MF_Params;
 
 void initialize_mf_model(MF_Model *model, int m, int n, int k);
+float compute_loss(MF_Model *model, Transaction *transactions, int num_transactions, float lambda);
 void train_mf_model(MF_Model *model, Transaction *transactions, int num_transactions, MF_Params *params);
 float predict_mf(MF_Model *model, int user_id, int item_id);
 float **generate_full_matrix(MF_Model *model);
