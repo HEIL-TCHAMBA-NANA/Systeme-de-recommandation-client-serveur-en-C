@@ -193,7 +193,7 @@ float precision(float **test_data, float **train_data) { // Rooute Mean Square E
 
     for (i = 0; i < nb_user; i++) {
         for (j = 0; j < nb_item; j++) {
-            if (test_data[i][j] != 0) { // Si la note est présente dans le test_data, on la predit pour tester la précision
+            if (test_data[i][j] != 0) { // Si la note est présente(est non nulle) dans le test_data, on la considère pour calculer le dataset
                 k++;
                 precision += (test_data[i][j] - Predict(i, j, train_data)) * (test_data[i][j] - Predict(i, j, train_data)); // On ajoute la différence carrée entre la note réelle et la note prédite
             }
