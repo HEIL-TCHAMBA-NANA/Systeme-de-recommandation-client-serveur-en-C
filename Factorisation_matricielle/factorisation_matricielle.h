@@ -1,6 +1,8 @@
 #ifndef _FACTORISATION_MATRICIELLE_H
 #define _FACTORISATION_MATRICIELLE_H
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 // Structure pour les matrices U, V et biais
 typedef struct {
@@ -27,4 +29,6 @@ float predict_mf(MF_Model *model, int user_id, int item_id);
 float **generate_full_matrix(MF_Model *model);
 void predict_all_mf(float **full_matrix, Transaction *test_data, int num_test, float *predictions);
 void evaluate_mf(Transaction *test_data, int num_test, float *predictions, float *rmse, float *mae);
+void free_mf_model(MF_Model *model);
+void free_full_matrix(float **matrix, int m);
 #endif

@@ -7,31 +7,31 @@
 
 int main() {
     int num_transactions, m, n;
-    Transaction *transactions = load_transactions("test_ratings.txt", &num_transactions, &m, &n);
+    Transaction *transactions = load_transactions("ratings.txt", &num_transactions, &m, &n);
+
     if (!transactions) {
-        printf("Échec du chargement.\n");
+        printf("Échec du chargement des transactions.\n");
         return 1;
     }
 
-    // Initialiser le modèle
-    MF_Model model;
-    initialize_mf_model(&model, m, n, 2); // k = 2 facteurs latents
+    printf("Nombre de transactions : %d\n", num_transactions);
+    printf("Nombre d'utilisateurs : %d\n", m);
+    printf("Nombre d'items : %d\n", n);
 
-    // Paramètres
-    float lambda = 0.1;
+    // Afficher quelques transactions pour vérifier
+    /*for (int i = 0; i < num_transactions && i < 5; i++) {
+        printf("Transaction %d: user=%d, item=%d, category=%d, rating=%.2f, timestamp=%ld\n",
+               i, transactions[i].user_id, transactions[i].item_id,
+               transactions[i].category_id, transactions[i].rating, transactions[i].timestamp);
+    }*/
 
-    // Calculer la perte initiale
-    float loss = compute_loss(&model, transactions, num_transactions, lambda);
-    printf("Perte initiale : %f\n", loss);
+    for (int i = 0; i < num_transactions && i < 5; i++) {
+        printf("Transaction %d: user=%d, item=%d, category=%d, rating=%.2f, timestamp=%ld\n",
+               i, transactions[i].user_id, transactions[i].item_id,
+               transactions[i].category_id, transactions[i].rating, transactions[i].timestamp);
+    }
 
     // Libérer la mémoire
-    for (int i = 0; i < model.m; i++) free(model.U[i]);
-    for (int j = 0; j < model.n; j++) free(model.V[j]);
-    free(model.U);
-    free(model.V);
-    free(model.O);
-    free(model.P);
     free(transactions);
-
     return 0;
 }
