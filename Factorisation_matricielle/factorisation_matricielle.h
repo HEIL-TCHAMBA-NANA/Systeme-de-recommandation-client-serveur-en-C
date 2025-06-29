@@ -27,7 +27,7 @@ float compute_loss(MF_Model *model, Transaction *transactions, int num_transacti
 void train_mf_model(MF_Model *model, Transaction *transactions, int num_transactions, MF_Params *params);
 float predict_mf(MF_Model *model, int user_id, int item_id);
 float **generate_full_matrix(MF_Model *model);
-void predict_all_mf(float **full_matrix, Transaction *test_data, int num_test, float *predictions);
+void predict_all_mf(float **full_matrix, Transaction *test_data, int num_test, float *predictions, int m, int n);
 void evaluate_mf(Transaction *test_data, int num_test, float *predictions, float *rmse, float *mae);
 void free_mf_model(MF_Model *model);
 void free_full_matrix(float **matrix, int m);
