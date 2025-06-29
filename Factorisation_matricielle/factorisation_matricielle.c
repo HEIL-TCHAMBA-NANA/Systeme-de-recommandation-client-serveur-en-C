@@ -372,3 +372,21 @@ void free_full_matrix(float **matrix, int m) {
     }
     free(matrix);
 }
+
+
+
+float **MF(Transaction *train_data, int num_transactions, MF_Params *params, int m, int n, int k) {
+    if (!train_data || !params || num_transactions <= 0 || m <= 0 || n <= 0 || k <= 0) {
+        fprintf(stderr, "Paramètres invalides\n");
+        return NULL;
+    }
+    MF_Model model;
+    initialize_mf_model(&model, m, n, k);
+    if (!model.U || !model.V || !model.O || !model.P) {
+        return NULL; // Échec d'initialisation
+    }
+    train_mf_model(&model, train_data, num_transactions, params);
+    float **full_matrix = generate_full_matrix(&model);
+    free_mf_model(&model);
+    return full_matrix;
+}
