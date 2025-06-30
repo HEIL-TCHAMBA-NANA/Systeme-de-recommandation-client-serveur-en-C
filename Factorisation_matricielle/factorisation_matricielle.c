@@ -1,8 +1,5 @@
 
 #include "factorisation_matricielle.h"
-#include "function_principale.h"
-
-
 
 void initialize_mf_model(MF_Model *model, int m, int n, int k) {
     // Ajout 1 : Vérification du pointeur model

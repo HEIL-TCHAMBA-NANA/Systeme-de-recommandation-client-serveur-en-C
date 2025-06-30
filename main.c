@@ -3,7 +3,6 @@
 #include <string.h>
 #include "function_principale.h"
 #include "Factorisation_matricielle/factorisation_matricielle.h"
-#include "struct_transaction.h"
 
 
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "function_principale.h"
+#include "structures/struct_transaction.h"
 
 // Fonction pour charger les transactions
 Transaction *load_transactions(const char *filename, int *num_transactions, int *m, int *n) {
