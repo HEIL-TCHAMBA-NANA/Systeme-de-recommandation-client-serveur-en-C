@@ -6,7 +6,6 @@
 #include "knn/knn.h"
 
 
-
 int main() {
     int num_transactions, m, n;
     Transaction *transactions = load_transactions("ratings.txt", &num_transactions, &m, &n);
