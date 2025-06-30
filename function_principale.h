@@ -9,14 +9,6 @@ typedef struct {
     long timestamp;  // Horodatage
 } Transaction;
 
-typedef struct save{
-    Transaction element;
-    struct save *next;
-} save;
-
-    save **get_data(char *filename,save**); 
-
-
 //Ici on mettra les fonctions qui ne sont pas liees a une bibliotheque particulière comme par exemple les fonctions de manipulation de fichiers.
 
 #endif
