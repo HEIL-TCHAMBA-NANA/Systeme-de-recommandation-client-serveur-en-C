@@ -111,3 +111,65 @@ Transaction *load_transactions(const char *filename, int *num_transactions, int 
 
     return transactions;
 }
+
+
+float **Generate_matrix_knn(Transaction *transactions, int num_transactions, int m, int n) {
+    // Trouver les user_id et item_id uniques et créer des mappings
+    int *user_ids = (int *)malloc(m * sizeof(int));
+    int *item_ids = (int *)malloc(n * sizeof(int));
+    int user_count = 0, item_count = 0;
+
+    // Remplir les tableaux d'IDs uniques
+    for (int i = 0; i < num_transactions; i++) {
+        int found_user = 0, found_item = 0;
+        for (int j = 0; j < user_count; j++) {
+            if (user_ids[j] == transactions[i].user_id) {
+                found_user = 1;
+                break;
+            }
+        }
+        if (!found_user) {
+            user_ids[user_count++] = transactions[i].user_id;
+        }
+        for (int j = 0; j < item_count; j++) {
+            if (item_ids[j] == transactions[i].item_id) {
+                found_item = 1;
+                break;
+            }
+        }
+        if (!found_item) {
+            item_ids[item_count++] = transactions[i].item_id;
+        }
+    }
+
+    // Allocation de la matrice
+    float **matrix = (float **)malloc(m * sizeof(float *));
+    for (int i = 0; i < m; i++) {
+        matrix[i] = (float *)calloc(n, sizeof(float)); // Initialisation à 0
+    }
+
+    // Remplissage de la matrice avec les transactions
+    for (int i = 0; i < num_transactions; i++) {
+        int user_index = -1, item_index = -1;
+        for (int j = 0; j < user_count; j++) {
+            if (user_ids[j] == transactions[i].user_id) {
+                user_index = j;
+                break;
+            }
+        }
+        for (int j = 0; j < item_count; j++) {
+            if (item_ids[j] == transactions[i].item_id) {
+                item_index = j;
+                break;
+            }
+        }
+        if (user_index != -1 && item_index != -1) {
+            matrix[user_index][item_index] = transactions[i].rating;
+        }
+    }
+
+    free(user_ids);
+    free(item_ids);
+
+    return matrix;
+}
