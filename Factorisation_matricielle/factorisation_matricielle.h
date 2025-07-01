@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "structures/struct_transaction.h"
+#include <math.h>
+#include "../structures/struct_transaction.h"
 // Structure pour les matrices U, V et biais
 typedef struct {
     float **U;       
