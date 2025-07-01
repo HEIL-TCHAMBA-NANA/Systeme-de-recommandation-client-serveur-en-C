@@ -5,7 +5,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../structures/struct_transaction.h"
+
 /*******************************************************/
+
+float **Generate_matrix_knn(Transaction *transactions, int num_transactions, int m, int n);
 
 // Structure pour stocker l'indice et la distance (utiliser pour selectionner les K plus proches voisins)
 typedef struct {
