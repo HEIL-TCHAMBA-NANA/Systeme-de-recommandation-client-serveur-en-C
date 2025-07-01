@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "function_principale.h": "c"
+        "function_principale.h": "c",
+        "algorithm": "c"
     }
 }
