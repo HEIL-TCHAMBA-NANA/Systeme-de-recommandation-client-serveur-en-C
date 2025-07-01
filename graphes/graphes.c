@@ -17,7 +17,7 @@ save **get_data(char *filename, save** data, char *critere){
     fclose(f1);
     FILE *f = fopen(filename,"r");
         if (f == NULL){
-            perror("Erreur lors de l'ouverture du fichier");
+            perror("Erreur lors de l'ouverture du fichier de données.");
             exit(EXIT_FAILURE);
         }
         data = malloc(nbre*sizeof(save*));
@@ -30,12 +30,10 @@ save **get_data(char *filename, save** data, char *critere){
         {   
             occuped = false;
             position = 0;
-            for (j = 0; j < i; j++){                 
+            for (j = 0; j <= i; j++){                 
                 if (strcmp(critere,"user_id") == 0 && data[j] != NULL &&  data[j]->element.user_id == elt.user_id){
                     occuped = true;
                     position = j;
-                    //printf("\nJ: %d ",j);
-                    //printf("-- I: %d\n",i);
                 }
                 if (strcmp(critere,"item_id") == 0 && data[j] != NULL &&  data[j]->element.item_id == elt.item_id){
                     occuped = true;
@@ -68,7 +66,8 @@ save **get_data(char *filename, save** data, char *critere){
                 data[position] = tmp;
                 //printf("data[%d]=%d->data[%d]=%d\n",position,data[position]->element.user_id,position,data[position]->next->element.user_id);
             }
-        }     
+        }
+        
     fclose(f);
     return data;
 }
@@ -104,8 +103,8 @@ data get_userIds_and_itemIds(char *filename,data data_list){
         i = 0;
         j = 0;
         while (fscanf(f,"%d %d %d %f %ld",&user,&item,&category,&rating,&timestamp) != EOF)
-        {
-            if (recherche_lineaire(data_list.item_ids,user,0,nbre) == false)
+        {   
+            if (recherche_lineaire(data_list.item_ids,item,0,nbre) == false)
             {
                 data_list.item_ids[i] = item;
                 ++i;
@@ -118,6 +117,7 @@ data get_userIds_and_itemIds(char *filename,data data_list){
         }
         data_list.nbreItems = i;
         data_list.nbreUsers = j;
+        
     fclose(f);
         return data_list;
 }
@@ -143,6 +143,8 @@ bool recherche_lineaire(int *array, int finded,int start, int size){
 int **get_matrice_adjascence(char *filename, int **matrice){
     data data_list;
     data_list =  get_userIds_and_itemIds(filename, data_list);
+    printf("nbreUsers=%d\n",data_list.nbreUsers);
+    printf("nbreItems=%d\n",data_list.nbreItems);
     int i,j=0;
     int size = data_list.nbreItems+data_list.nbreUsers;
     matrice = malloc(size*sizeof(int *));
@@ -168,7 +170,6 @@ int **get_matrice_adjascence(char *filename, int **matrice){
         }
         
     }
-    printf("\n--END-USERS--\n");
     for (i = data_list.nbreUsers; i < size; i++){
         for (j = data_list.nbreUsers; j < size; j++){
             matrice[i][j] = 0;
@@ -176,21 +177,14 @@ int **get_matrice_adjascence(char *filename, int **matrice){
         int *tab;
         for (j = 0;j < data_list.nbreUsers; j++)
         {   
-            //printf("\n--BEGIN--\n");
-            tab = get_userIds_per_itemId(data_list.item_ids[i],filename,tab);
-            //printf("\n--BEGIN-1--\n");
-            if (recherche_lineaire(tab,data_list.item_ids[j],1,tab[0]) == true)
+            tab = get_userIds_per_itemId(data_list.item_ids[i-data_list.nbreUsers],filename,tab);
+            if (recherche_lineaire(tab,data_list.user_ids[j],1,tab[0]) == true)
             {   
-                //printf("\n--TRUE-1--\n");
-                matrice[i][j+data_list.nbreUsers] = 1;  
-                //printf("\n--END-1--\n");
+                matrice[i][j] = 1;  
             }
             else{
-                //printf("\n--FALSE-2--\n");
                 matrice[i][j+data_list.nbreUsers] = 0;
-                //printf("\n--END-2--\n");
             }            
-            //printf("\n--END--\n");
         }
     }
     return matrice;
@@ -294,9 +288,11 @@ int *get_userIds_per_itemId(int item_id, char *filename, int *tab){
 
 
 int main(void){
-    //char *filename = "data.txt";
-    //save **elt = NULL;
-    //elt = get_data(filename,elt,"item_id");
+    // char *filename = "data.txt";
+    // data elt;
+    // elt = get_userIds_and_itemIds(filename,elt);
+    // save **elt = NULL;
+    // elt = get_data(filename,elt,"item_id");
     // int *tab = NULL;
     // tab = get_itemsIds_per_userId(97,"data.txt",tab);
     // printf("\nTaille: %d\n",tab[0]);
@@ -316,6 +312,8 @@ int main(void){
     //     }
         
     // }
+
+
     int **matrice = NULL;
     data data_list;
     data_list =  get_userIds_and_itemIds("data.txt",data_list);
