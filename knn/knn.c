@@ -20,7 +20,7 @@ float **Pearson(float ** train_data, int nb_user, int nb_item) {
 
     int i,j,k;
 
-    float **result = malloc(nb_user * sizeof(float));
+    float **result = malloc(nb_user * sizeof(float *));
     for (i = 0; i < nb_user; i++) {
         result[i] = malloc(nb_user * sizeof(float)); // Initialisation de la matrice de résultats
     }
@@ -73,7 +73,7 @@ float Predict(int user_id, int item_id, float **train_data, int nb_user, int nb_
     
     int i, j = 0;
 
-    float **result = malloc(nb_user * sizeof(float));
+    float **result = malloc(nb_user * sizeof(float *));
     for (i = 0; i < nb_user; i++) {
         result[i] = malloc(nb_user * sizeof(float)); // Initialisation de la matrice de résultats
     }
