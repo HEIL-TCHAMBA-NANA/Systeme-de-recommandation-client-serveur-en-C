@@ -68,7 +68,7 @@ int main() {
         serv_addr.sin_port = htons(PORT);
 
         // Conversion de l'adresse IP
-        if (inet_pton(AF_INET, "192.168.1.168", &serv_addr.sin_addr) <= 0) {
+        if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
             printf("\nAdresse invalide ou non supportée \n");
             close(sock);
             return -1;
