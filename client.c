@@ -20,7 +20,7 @@ int main() {
 
     client_t client;
     client.user_id = 1;     // Exemple d'ID utilisateur
-    client.nb_item = 2;     // Exemple de nombre d'items
+    client.nb_item = 4;     // Exemple de nombre d'items
     strcpy(client.algorithm, "KNN"); // Copier l'algorithme
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -32,7 +32,7 @@ int main() {
     serv_addr.sin_port = htons(PORT);
 
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "10.2.65.107", &serv_addr.sin_addr) <= 0 ) {
+    if (inet_pton(AF_INET, "192.168.171.81", &serv_addr.sin_addr) <= 0 ) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
