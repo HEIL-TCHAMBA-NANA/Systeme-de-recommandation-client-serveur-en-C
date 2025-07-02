@@ -2,9 +2,9 @@
 
 ## Aperçu
 
-Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant deux algorithmes principaux : la factorisation matricielle (FM) et l'algorithme des k plus proches voisins (KNN). Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes des clients. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
+Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant trois algorithmes principaux : la factorisation matricielle (FM), l'algorithme des k plus proches voisins (KNN) et l'algoeithme PAGERANK des GRAPHES. Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes des clients. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
 
-Le projet est conçu pour être modulaire, avec des fichiers séparés pour les algorithmes (FM et KNN), la gestion des données, et les composants client et serveur.
+Le projet est conçu pour être modulaire, avec des fichiers séparés pour les algorithmes (FM, KNN et GRAPHES), la gestion des données, et les composants client et serveur.
 
 ## Structure du projet
 
@@ -16,7 +16,7 @@ Le projet est organisé en plusieurs fichiers, chacun ayant un rôle spécifique
 - **function_principale.h / function_principale.c** : Fournit des fonctions utilitaires pour charger les transactions, convertir des dates en timestamps, filtrer les transactions par période, supprimer des transactions, nettoyer les fichiers de test, et générer des top-N recommandations.
 - **knn.h / knn.c** : Implémente l'algorithme KNN, incluant la génération d'une matrice utilisateur-item, le calcul de la similarité de Pearson, la prédiction des notes, et l'évaluation de l'erreur (RMSE).
 - **factorisation_matricielle.h / factorisation_matricielle.c** : Implémente l'algorithme de factorisation matricielle, avec l'initialisation du modèle, l'entraînement par descente de gradient, la prédiction des notes, et l'évaluation (RMSE et MAE).
-- **graphes.h / graphes.c** : Fournit des fonctions pour représenter les données sous forme de graphes, notamment la création d'une matrice d'adjacence bipartite et la récupération des identifiants d'utilisateurs et d'items.
+- **functions.h / functions.c** : Fournit des fonctions pour représenter les données sous forme de graphes, notamment la création d'une matrice d'adjacence bipartite et la récupération des identifiants d'utilisateurs et d'items.
 - **struct_transaction.h** : Définit la structure `Transaction` utilisée pour stocker les données (user_id, item_id, rating, category_id, timestamp).
 
 ## Prérequis
@@ -34,7 +34,7 @@ Pour compiler le projet, assurez-vous que tous les fichiers source sont dans le 
 
 ### Compilation du serveur
 ```bash
-gcc -o serveur serveur.c function_principale.c knn/knn.c Factorisation_matricielle/factorisation_matricielle.c graphes.c -I. -Iknn -IFactorisation_matricielle -lm
+gcc -o serveur serveur.c function_principale.c knn/knn.c Factorisation_matricielle/factorisation_matricielle.c graphes/functions.c -I. -Iknn -IFactorisation_matricielle -lm
 ```
 
 ### Compilation du client
