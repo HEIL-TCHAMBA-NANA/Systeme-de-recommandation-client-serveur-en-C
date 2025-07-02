@@ -9,7 +9,7 @@
 typedef struct
 {
     int user_id;  // Identifiant de l'utilisateur
-    int item_id;  // Identifiant de l'item
+    int nb_items; // Nombre d'items recommandés
     char *algorithm; // Algorithme utilisé pour la recommandation
 } client_t;
 
@@ -21,7 +21,7 @@ int main() {
 
     client_t client;
     client.user_id = 1;  // Exemple d'ID utilisateur
-    client.item_id = 2;  // Exemple d'ID item
+    client.nb_items = 2;  // Exemple d'ID item
     client.algorithm = "KNN"; // Exemple d'algorithme
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -33,7 +33,7 @@ int main() {
     serv_addr.sin_port = htons(PORT);
 
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "37.60.244.227", &serv_addr.sin_addr) <= 0 ) {
+    if (inet_pton(AF_INET, "10.2", &serv_addr.sin_addr) <= 0 ) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
@@ -41,11 +41,16 @@ int main() {
         fprintf(stderr, "\nConnection Failed: %s (errno: %d)\n", strerror(errno), errno);
         return -1;
     }
-    send(sock, &client.user_id, sizeof(client.user_id), 0);
-    send(sock, &client.item_id, sizeof(client.item_id), 0);
-    send(sock, client.algorithm, strlen(client.algorithm), 0);
+    
+    send(sock, &client, sizeof(client_t), 0);
+    printf("Données envoyées: user_id=%d, nb_items=%d, algorithm=%s\n", client.user_id, client.nb_items, client.algorithm);
+    
+    //send(sock, &client.user_id, sizeof(client.user_id), 0);
+    //send(sock, &client.nb_items, sizeof(client.nb_items), 0);
+    //send(sock, client.algorithm, strlen(client.algorithm), 0);
 
-    printf("Les données ont été envoyées avec succès \n\n");
+    //printf("Les données ont été envoyées avec succès \n\n");
+    
     int valread = read(sock, buffer, 1024);
     printf("%s\n", buffer);
 
