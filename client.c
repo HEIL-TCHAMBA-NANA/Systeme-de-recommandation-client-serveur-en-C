@@ -8,11 +8,10 @@
 
 typedef struct
 {
-    int user_id;  // Identifiant de l'utilisateur
-    int item_id;  // Identifiant de l'item
-    char *algorithm; // Algorithme utilisé pour la recommandation
+    int user_id;           // Identifiant de l'utilisateur  
+    int nb_item;           // Nombre d'items à recommander
+    char algorithm[10];    // Algorithme utilisé (taille fixe)
 } client_t;
-
 
 int main() {
     int sock = 0;
@@ -20,9 +19,9 @@ int main() {
     char buffer[1024] = {0};
 
     client_t client;
-    client.user_id = 1;  // Exemple d'ID utilisateur
-    client.item_id = 2;  // Exemple d'ID item
-    client.algorithm = "KNN"; // Exemple d'algorithme
+    client.user_id = 1;     // Exemple d'ID utilisateur
+    client.nb_item = 2;     // Exemple de nombre d'items
+    strcpy(client.algorithm, "KNN"); // Copier l'algorithme
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
@@ -37,15 +36,15 @@ int main() {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
+    
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         fprintf(stderr, "\nConnection Failed: %s (errno: %d)\n", strerror(errno), errno);
         return -1;
     }
-    send(sock, &client.user_id, sizeof(client.user_id), 0);
-    send(sock, &client.item_id, sizeof(client.item_id), 0);
-    send(sock, client.algorithm, strlen(client.algorithm), 0);
-
+    
+    send(sock, &client, sizeof(client_t), 0);
     printf("Les données ont été envoyées avec succès \n\n");
+    
     int valread = read(sock, buffer, 1024);
     printf("%s\n", buffer);
 
