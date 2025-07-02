@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
 #include "function_principale.h"
 #include "structures/struct_transaction.h"
 
@@ -151,6 +149,190 @@ Transaction *load_transactions(const char *filename, int *num_transactions, int 
     free(item_map);
     fclose(file);
     return transactions;
+}
+
+
+long date_to_timestamp(const char *date_str) {
+    struct tm date = {0};
+    int day, month, year;
+
+    // Parser la date au format JJ/MM/AAAA
+    if (sscanf(date_str, "%d/%d/%d", &day, &month, &year) != 3) {
+        fprintf(stderr, "Format de date invalide. Utilisez JJ/MM/AAAA\n");
+        return -1;
+    }
+
+    // Valider les plages
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1970) {
+        fprintf(stderr, "Date invalide : jour [1-31], mois [1-12], année >= 1970\n");
+        return -1;
+    }
+
+    // Remplir la structure tm
+    date.tm_mday = day;
+    date.tm_mon = month - 1;    // Mois : 0-11
+    date.tm_year = year - 1900; // Année depuis 1900
+    date.tm_hour = 0;
+    date.tm_min = 0;
+    date.tm_sec = 0;
+    date.tm_isdst = -1;         // Gestion automatique de l'heure d'été
+
+    // Convertir en timestamp
+    time_t timestamp = mktime(&date);
+    if (timestamp == -1) {
+        fprintf(stderr, "Erreur de conversion ");
+        return -1;
+    }
+
+    return (long)timestamp;
+}
+
+
+void periodic_transaction(const char *filename, const char *debut_str, const char *fin_str){
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    FILE *output_file = fopen("transactions_periodiques.txt", "w");
+    if (!output_file) {
+        perror("Erreur lors de l'ouverture du fichier de sortie");
+        fclose(file);
+        return;
+    }
+
+    long debut_ts = date_to_timestamp(debut_str);
+    long fin_ts = date_to_timestamp(fin_str);
+    if (debut_ts == -1 || fin_ts == -1) {
+        fclose(file);
+        fclose(output_file);
+        return; // Erreur de conversion de date
+    }
+
+    while (1) {
+        char line[256];
+        if (!fgets(line, sizeof(line), file)) {
+            break; // Fin du fichier
+        }
+
+        int u_id, i_id, c_id;
+        float r;
+        long ts;
+        if (sscanf(line, "%d%d%d%f%ld", &u_id, &i_id, &c_id, &r, &ts) != 5) {
+            fprintf(stderr, "Ligne mal formée : %s", line);
+            continue;
+        }
+        // Vérification de l'intervalle de temps
+        if (ts >= debut_ts && ts <= fin_ts) {
+            fprintf(output_file, "%s", line);
+        }
+    }
+    
+}
+
+void delete_transaction(const char *filename, int min_U, int min_I) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    FILE *temp_file = fopen("temp.txt", "w");
+    if (!temp_file) {
+        perror("Erreur lors de l'ouverture du fichier temporaire");
+        fclose(file);
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        int u_id, i_id, c_id;
+        float r;
+        long ts;
+        if (sscanf(line, "%d%d%d%f%ld", &u_id, &i_id, &c_id, &r, &ts) != 5) {
+            fprintf(stderr, "Ligne mal formée : %s", line);
+            continue;
+        }
+
+        // Vérification des conditions de suppression
+        if (u_id < min_U && i_id < min_I) {
+            continue; // Ne pas écrire cette ligne dans le fichier temporaire
+        }
+        fprintf(temp_file, "%s", line);
+    }
+
+    fclose(file);
+    fclose(temp_file);
+
+    // Remplacer l'ancien fichier par le nouveau
+    remove(filename);
+    rename("temp.txt", filename);
+}
+
+void clean_test_file(const char *training, const char *test) {
+    FILE *train_file = fopen(training, "r");
+    if (!train_file) {
+        perror("Erreur lors de l'ouverture du fichier d'entraînement");
+        return;
+    }
+
+    FILE *test_file = fopen(test, "r");
+    if (!test_file) {
+        perror("Erreur lors de l'ouverture du fichier de test");
+        fclose(train_file);
+        return;
+    }
+
+    FILE *temp_file = fopen("temp_test.txt", "w");
+    if (!temp_file) {
+        perror("Erreur lors de l'ouverture du fichier temporaire");
+        fclose(train_file);
+        fclose(test_file);
+        return;
+    }
+
+    // Charger toutes les transactions du fichier train en mémoire (sous forme de chaînes)
+    // On suppose que le nombre de transactions est raisonnable pour la RAM
+    #define MAX_LINES 1000000
+    #define LINE_SIZE 256
+    char **train_lines = malloc(MAX_LINES * sizeof(char *));
+    int train_count = 0;
+    char line[LINE_SIZE];
+    while (fgets(line, sizeof(line), train_file)) {
+        train_lines[train_count] = strdup(line);
+        train_count++;
+        if (train_count >= MAX_LINES) break;
+    }
+
+    // Pour chaque ligne du fichier test, vérifier si elle existe dans train
+    char test_line[LINE_SIZE];
+    while (fgets(test_line, sizeof(test_line), test_file)) {
+        int found = 0;
+        for (int i = 0; i < train_count; i++) {
+            if (strcmp(test_line, train_lines[i]) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            fputs(test_line, temp_file);
+        }
+    }
+
+    // Libération mémoire
+    for (int i = 0; i < train_count; i++) {
+        free(train_lines[i]);
+    }
+    free(train_lines);
+
+    fclose(train_file);
+    fclose(test_file);
+    fclose(temp_file);
+
+    // Remplacer le fichier test par le fichier temporaire nettoyé
+    remove(test);
+    rename("temp_test.txt", test);
 }
 
 
