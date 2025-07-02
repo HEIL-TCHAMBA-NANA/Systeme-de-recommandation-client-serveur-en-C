@@ -8,6 +8,7 @@
 #include "function_principale.h"
 #include "Factorisation_matricielle/factorisation_matricielle.h"
 #include "knn/knn.h"
+#include "graphes/functions.h"
 
 // Même structure que côté client
 typedef struct
@@ -27,7 +28,7 @@ int main() {
     }
 
     // Préparer la matrice pour KNN
-    float **matrice_entrainement_knn = Generate_matrix_knn(donnees_entrainement, nb_transactions_entrainement, nb_utilisateurs, nb_items);
+    float **matrice_entrainement_knn = Generate_matrix_knn(donnees_entrainement,nb_transactions_entrainement, nb_utilisateurs, nb_items);
     if (!matrice_entrainement_knn) {
         fprintf(stderr, "Échec de la génération de la matrice des transactions\n");
         free(donnees_entrainement);
@@ -52,6 +53,19 @@ int main() {
         free(donnees_entrainement);
         return 1;
     }
+
+
+
+
+/*-----------------------------------------------------------------------------------------------------------------------*/
+float **matrice_complete_graphes = get_matrice_predictions("train.txt",nb_transactions_entrainement,donnees_entrainement,0.85);
+if(!matrice_complete_graphes){
+    fprintf(stderr, "Echec Graphes\n");
+    return 1;
+}
+/*-----------------------------------------------------------------------------------------------------------------------*/
+
+
 
     // Configurer le socket serveur
     int socket_serveur, nouvelle_connexion;
@@ -136,7 +150,18 @@ int main() {
                 }
                 strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
                 free(top_items);
-            } else {
+            }else if (strcmp(client_recu.algorithm, "GRAPHES") == 0){
+                get_top_n_recommendations(matrice_complete_graphes, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
+                char temp[256];
+                snprintf(reponse, sizeof(reponse), "Top %d items pour l'utilisateur %d (GRAPHES) : ", N, id_utilisateur);
+                for (int i = 0; i < N && top_items[i] != -1; i++) {
+                    snprintf(temp, sizeof(temp), "%d (%.2f), ", top_items[i], matrice_complete_graphes[id_utilisateur][top_items[i]]);
+                    strncat(reponse, temp, sizeof(reponse) - strlen(reponse) - 1);
+                }
+                strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
+                free(top_items);
+            }
+             else {
                 snprintf(reponse, sizeof(reponse), "Algorithme invalide: %s (supportés: FM, KNN)\n", client_recu.algorithm);
             }
         } else {
@@ -158,3 +183,4 @@ int main() {
     close(socket_serveur);
     return 0;
 }
+
