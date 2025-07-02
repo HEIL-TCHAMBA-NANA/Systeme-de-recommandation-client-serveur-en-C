@@ -206,8 +206,8 @@ void train_mf_model(MF_Model *model, Transaction *transactions, int num_transact
                 model->V[j][s] += alpha * (error * u_is - lambda * v_js);
             }
         }
-        float loss = compute_loss(model, transactions, num_transactions, lambda);
-        //gprintf("Epoch %d, Loss: %f\n", epoch, loss);
+        //float loss = compute_loss(model, transactions, num_transactions, lambda);
+        //printf("Epoch %d, Loss: %f\n", epoch, loss);
     }
 }
 
