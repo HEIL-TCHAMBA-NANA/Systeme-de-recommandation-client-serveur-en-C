@@ -5,43 +5,6 @@
 #include <math.h>
 #include"functions.h"
 
-// Fonction pour charger les transactions
-Transaction *load_transactions(const char *filename, int *num_transactions) {
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        perror("Erreur lors de l'ouverture du fichier");
-        return NULL;
-    }
-
-    int count = 0;
-    char line[256];
-    while (fgets(line, sizeof(line), file)) count++;
-    rewind(file);
-
-    Transaction *transactions = (Transaction *)malloc(count * sizeof(Transaction));
-    if (!transactions) {
-        perror("Erreur d'allocation mémoire");
-        fclose(file);
-        return NULL;
-    }
-
-    int index = 0;
-    while (fgets(line, sizeof(line), file)) {
-        if (sscanf(line, "%d %d %d %f %ld", 
-                   &transactions[index].user_id,
-                   &transactions[index].item_id,
-                   &transactions[index].category_id,
-                   &transactions[index].rating,
-                   &transactions[index].timestamp) == 5) {
-            index++;
-        }
-    }
-
-    *num_transactions = index;
-    fclose(file);
-    return transactions;
-}
-
 // Fonction pour obtenir les utilisateurs et items uniques
 Data get_unique_users_and_items(Transaction *transactions, int num_transactions) {
     Data data = {0};
@@ -217,14 +180,17 @@ void print_prediction_matrix(float **matrix, Data data) {
     }
 }
 
-float ** get_matrice_predictions(const char *filename, int num_transactions, Transaction *transactions,Data data, float **adj_matrix, float alpha, float **prediction_matrix) {
+float ** get_matrice_predictions(const char *filename, int num_transactions, Transaction *transactions, float alpha) {
    
-    // 1. Charger les données
-    transactions = load_transactions(filename, &num_transactions);
+   /*  // 1. Charger les données
+    transactions = load_transactions_graphes(filename, &num_transactions);
     if (!transactions || num_transactions == 0) {
         printf("Erreur lors du chargement des données.\n");
         return 1;
-    }
+    }*/
+
+    Data data;
+    float **adj_matrix;
     
     // 2. Obtenir les utilisateurs et items uniques
     data = get_unique_users_and_items(transactions, num_transactions);
@@ -236,7 +202,7 @@ float ** get_matrice_predictions(const char *filename, int num_transactions, Tra
     normalize_matrix(adj_matrix, data.nbreUsers + data.nbreItems);
     
     // 5. Créer la matrice de prédictions
-    prediction_matrix = create_prediction_matrix(data, adj_matrix, alpha);
+   float** prediction_matrix = create_prediction_matrix(data, adj_matrix, alpha);
 
     
     return prediction_matrix;

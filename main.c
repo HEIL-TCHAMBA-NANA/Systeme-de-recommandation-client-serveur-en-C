@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "function_principale.h"
-//#include "Factorisation_matricielle/factorisation_matricielle.h"
+#include "Factorisation_matricielle/factorisation_matricielle.h"
 #include "knn/knn.h"
+#include "graphes/functions.h"
 
 
 int main() {
