@@ -3,6 +3,7 @@
 #include"graphes.h"
 #include<stdbool.h>
 #include<string.h>
+#include <math.h>
 
 save **get_data(char *filename, save** data, char *critere){
 
@@ -357,124 +358,116 @@ float** somme_matrices(float **A, float **B, int lignes, int colonnes) {
 
 /* =========================================================================================== */
 
-float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d, char *filename){
+float **pageRank(float **pr, int **matrice_adjacence, float alpha, float **d, char *filename) {
     data file_data;
-    int size,i,j;
-    float **pr_new;
-    printf("\nPAGE-RANK\n");
-    matrice_adjacence = get_matrice_adjascence(filename,matrice_adjacence);
-    printf("\nPAGE-1\n");
-    file_data = get_userIds_and_itemIds(filename,file_data);
-    printf("\nPAGE-2\n");
-    size = file_data.nbreItems+file_data.nbreUsers;
-    pr = malloc(size*sizeof(int*));
-    
-    for (i = 0; i < size; i++){
-        pr[i] = malloc(sizeof(int));
-        pr[i][0] = 1/size;
+    int size, i, max_iter = 100;
+    float **pr_new, **M_alpha, **d_scaled;
+
+    // 1. Charger les données et initialiser la matrice d'adjacence
+    matrice_adjacence = get_matrice_adjascence(filename, matrice_adjacence);
+    file_data = get_userIds_and_itemIds(filename, file_data);
+    size = file_data.nbreItems + file_data.nbreUsers;
+
+    // 2. Initialiser le vecteur PR (taille size x 1)
+    pr = malloc(size * sizeof(float *));
+    for (i = 0; i < size; i++) {
+        pr[i] = malloc(sizeof(float));
+        pr[i][0] = 1.0 / size;  // Initialisation correcte avec 1.0
     }
 
-    pr_new = malloc(size*sizeof(float*));
-    for (i = 0; i < size; i++)
-    {
-        pr_new[i] = malloc(size*sizeof(float));
-        for (j = 0; j < size; j++)
-        {
-            pr_new[i][j] = 0;
+    // 3. Calculer M * alpha (taille size x size)
+    M_alpha = produit_scalaire(matrice_adjacence, size, size, alpha);
+
+    // 4. Itérations du PageRank
+    for (int iter = 0; iter < max_iter; iter++) {
+        // PR_new = alpha * M * PR
+        pr_new = produit_matrices(M_alpha, pr, size, size, 1);
+
+        // d_scaled = (1-alpha) * d
+        d_scaled = produit_scalaire_float(d, size, 1, 1 - alpha);
+
+        // PR = PR_new + d_scaled
+        for (i = 0; i < size; i++) {
+            pr[i][0] = pr_new[i][0] + d_scaled[i][0];
         }
-    }
-    
 
-    printf("\nPAGE-3\n");
-    pr_new = produit_scalaire(matrice_adjacence,size,size,alpha);
-    printf("\nPAGE-3--1\n");
-    pr = produit_matrices(pr_new,pr,1,size,size);
-    for (i = 0; i < size; i++)
-    {
-        printf("i = %d",i);
-        printf("pr[%d] = %f\n",i,pr[0][i]);
+        // Libérer la mémoire temporaire
+        free(pr_new[0]);
+        free(pr_new);
+        free(d_scaled[0]);
+        free(d_scaled);
     }
-    printf("\nPAGE-4\n");
-    d = produit_scalaire_float(d,1,size,1-alpha);
-    printf("\nPAGE-5\n");
-    pr_new = somme_matrices(pr,d,1,size);
-    for (i = 0; i < size; i++)
-    {
-        printf("i = %d",i);
-        printf("pr[%d] = %f\n",i,pr[0][i]);
-    }
-    printf("\nPAGE-6\n");
-    /*for (i = 0; i < max_iter; i++)
-    {   
-        printf("\nBOUCLE-1\n");
-        pr = produit_scalaire_float(pr,size,1,alpha);
-        printf("\nBOUCLE-1--1\n");
-        pr = produit_matrices(pr_new,pr,size,size,size);
-        printf("\nBOUCLE-2\n");
-        d = produit_scalaire_float(d,size,1,1-alpha);
-        printf("\nBOUCLE-3\n");
-        pr = somme_matrices(pr,d,1,size);
-        printf("\nBOUCLE-4\n");
-    }*/
-    printf("\nPAGE-7\n");
+
+    // 5. Libérer M_alpha
+    for (i = 0; i < size; i++) free(M_alpha[i]);
+    free(M_alpha);
 
     return pr;
 }
 
 
-/* =========================================================================================== */
-
-
-int main(){
+/* ==========================================================================================*/
+int main() {
     char *filename = "data.txt";
     data file_data;
-    int size,user_id,i;
-    float **d,**pr=NULL;
+    int size, user_id, i;
+    float **d, **pr = NULL;
     int **matrice_adjacence = NULL;
-    int alpha = 0.85;//max_iter = 50;
+    float alpha = 0.85;
 
-    file_data = get_userIds_and_itemIds(filename,file_data);
-    size = file_data.nbreItems+file_data.nbreUsers;
+    // Charger les données utilisateurs/items
+    file_data = get_userIds_and_itemIds(filename, file_data);
+    size = file_data.nbreItems + file_data.nbreUsers;
+
+    // Demander à l'utilisateur d'entrer son user_id
     printf("Veuillez entrer votre userID: ");
-    user_id = scanf("%d",&user_id);
-    printf("User-id-1 = %d\n",user_id);
-    user_id = 322;
-    d = malloc(size*sizeof(float*));
-    for (i = 0; i < size; i++)
-    {
+    scanf("%d", &user_id);
+
+    // Initialiser le vecteur de personnalisation d (tout à 0)
+    d = malloc(size * sizeof(float *));
+    for (i = 0; i < size; i++) {
         d[i] = malloc(sizeof(float));
-        d[i][0] = 0;
-    }
-    
-    //pr[0] = malloc((size)*sizeof(float));
-
-    printf("\n--1--\n");
-
-    if (recherche_lineaire(file_data.user_ids,user_id,0,file_data.nbreUsers) == false){
-        printf("User-id = %d\n",user_id);
-        return file_data.item_ids[rand()%file_data.nbreItems];
+        d[i][0] = 0.0;
     }
 
-    printf("\n--2--\n");
-
-    for (i = 0; i < file_data.nbreUsers; i++)
-        if (file_data.user_ids[i] == user_id)
-            d[0][i] = 1;
-    
-    printf("\n--3--\n");
-
-    pr = pageRank(pr,matrice_adjacence,alpha,d,filename);
-
-    printf("\n--4--\n");
-
-    for (i = 0; i < size; i++)
-    {
-        printf("i = %d",i);
-        printf("pr[%d] = %f\n",i,pr[0][i]);
+    // Trouver la position de l'utilisateur et mettre 1.0
+    bool user_found = false;
+    for (i = 0; i < file_data.nbreUsers; i++) {
+        if (file_data.user_ids[i] == user_id) {
+            d[i][0] = 1.0;  // Position correspondante dans le vecteur
+            user_found = true;
+            break;
+        }
     }
 
-    printf("\n--5--\n");
-    
-    
+    // Si l'utilisateur n'existe pas, retourner un item aléatoire
+    if (!user_found) {
+        printf("Utilisateur non trouvé. Recommandation aléatoire.\n");
+        int random_item = file_data.item_ids[rand() % file_data.nbreItems];
+        printf("Item recommandé: %d\n", random_item);
+        
+        // Libérer la mémoire avant de quitter
+        for (i = 0; i < size; i++) free(d[i]);
+        free(d);
+        return 0;
+    }
+
+    // Calculer le PageRank
+    pr = pageRank(pr, matrice_adjacence, alpha, d, filename);
+
+    // Afficher les résultats (ex: top 3 items non notés par l'utilisateur)
+    printf("\nScores PageRank:\n");
+    for (i = file_data.nbreUsers; i < size; i++) {
+        printf("Item %d: score = %f\n", file_data.item_ids[i - file_data.nbreUsers], pr[i][0]);
+    }
+
+    // Libérer la mémoire
+    for (i = 0; i < size; i++) {
+        free(pr[i]);
+        free(d[i]);
+    }
+    free(pr);
+    free(d);
+
     return 0;
 }

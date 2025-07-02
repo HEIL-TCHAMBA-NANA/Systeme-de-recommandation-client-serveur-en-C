@@ -32,4 +32,5 @@
     float** somme_matrices(float **A, float **B, int lignes, int colonnes);
 
     float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d,char *filename);
+    float** get_matrice_prediction(char *filename, float alpha);
 #endif
