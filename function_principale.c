@@ -335,6 +335,8 @@ void clean_test_file(const char *training, const char *test) {
 }
 
 void get_top_n_recommendations(float **full_matrix, int user_id, int m, int n, int N, int *top_items) {
+    int r = m;
+    r = r + 1;
     typedef struct { int item_id; float rating; } ItemRating;
     ItemRating *ratings = malloc(n * sizeof(ItemRating));
     if (!ratings) return;
