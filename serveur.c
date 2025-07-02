@@ -21,7 +21,14 @@ int main() {
     // Préparer la matrice pour KNN
     float **matrice_entrainement_knn = Generate_matrix_knn(donnees_entrainement, nb_transactions_entrainement, nb_utilisateurs, nb_items);
     if (!matrice_entrainement_knn) {
+        fprintf(stderr, "Échec de la génération de la matrice des transaction\n");
+        free(donnees_entrainement);
+        return 1;
+    }
+    float **matrice_complete_knn = Predict_all(matrice_entrainement_knn, matrice_entrainement_knn, nb_utilisateurs, nb_items);
+    if (!matrice_complete_knn) {
         fprintf(stderr, "Échec de la génération de la matrice KNN\n");
+        free(matrice_entrainement_knn);
         free(donnees_entrainement);
         return 1;
     }
@@ -102,14 +109,14 @@ int main() {
                     strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
                     free(top_items);
                 } else if (strcmp(algorithme, "KNN") == 0) {
-                    get_top_n_recommendations(matrice_entrainement_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
+                    get_top_n_recommendations(matrice_complete_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
                     char temp[256];
                     snprintf(reponse, sizeof(reponse), "Top %d items pour l'utilisateur %d (KNN) : ", N, id_utilisateur);
-                    for (int i = 0; i < N && i < nb_items; i++) {
+                    /*for (int i = 0; i < N && i < nb_items; i++) {
                         float note = Predict(id_utilisateur, top_items[i], matrice_entrainement_knn, nb_utilisateurs, nb_items);
                         snprintf(temp, sizeof(temp), "%d (%.2f), ", top_items[i], note);
                         strncat(reponse, temp, sizeof(reponse) - strlen(reponse) - 1);
-                    }
+                    }*/
                     strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
                     free(top_items);
                 } else {
