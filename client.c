@@ -32,7 +32,7 @@ int main() {
     serv_addr.sin_port = htons(PORT);
 
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "10.2", &serv_addr.sin_addr) <= 0 ) {
+    if (inet_pton(AF_INET, "10.2.65.107", &serv_addr.sin_addr) <= 0 ) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
@@ -41,7 +41,7 @@ int main() {
         fprintf(stderr, "\nConnection Failed: %s (errno: %d)\n", strerror(errno), errno);
         return -1;
     }
-    
+
     send(sock, &client, sizeof(client_t), 0);
     printf("Les données ont été envoyées avec succès \n\n");
     
