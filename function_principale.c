@@ -337,3 +337,27 @@ void clean_test_file(const char *training, const char *test) {
     rename("temp_test.txt", test);
 }
 
+
+void get_top_n_recommendations(float **full_matrix, int user_id, int m, int n, int N, int *top_items) {
+    typedef struct { int item_id; float rating; } ItemRating;
+    ItemRating *ratings = malloc(n * sizeof(ItemRating));
+    if (!ratings) return;
+    for (int j = 0; j < n; j++) {
+        ratings[j].item_id = j;
+        ratings[j].rating = full_matrix[user_id][j];
+    }
+    // Tri par note décroissante (tri à bulles simple)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (ratings[j].rating < ratings[j + 1].rating) {
+                ItemRating temp = ratings[j];
+                ratings[j] = ratings[j + 1];
+                ratings[j + 1] = temp;
+            }
+        }
+    }
+    for (int i = 0; i < N && i < n; i++) {
+        top_items[i] = ratings[i].item_id;
+    }
+    free(ratings);
+}
