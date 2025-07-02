@@ -30,24 +30,26 @@ Pour compiler et exécuter ce projet, vous aurez besoin de :
 
 ## Compilation
 
-Pour compiler le projet, assurez-vous que tous les fichiers source sont dans le même répertoire, avec les sous-dossiers `structures`, `knn`, et `Factorisation_matricielle`. Utilisez les commandes suivantes avec `gcc` :
+Pour compiler le projet, assurez-vous que tous les fichiers source sont dans le même répertoire, avec les sous-dossiers `structures`, `knn`, `Factorisation_matricielle` et `graphes`. Utilisez les commandes suivantes avec `make` :
+
+### Afficher le guide d'utilisation du Makefile
+```bash
+make help
+```
+### Compiler l'ensemble du programme (client et serveur)
+```bash
+make all
+```
 
 ### Compilation du serveur
 ```bash
-gcc -o serveur serveur.c function_principale.c knn/knn.c Factorisation_matricielle/factorisation_matricielle.c graphes/functions.c -I. -Iknn -IFactorisation_matricielle -lm
+make serveur
 ```
 
 ### Compilation du client
 ```bash
-gcc -o client client.c -I.
+make client
 ```
-
-### Compilation du programme principal
-```bash
-gcc -o main main.c function_principale.c -I.
-```
-
-L'option `-lm` est nécessaire pour lier la bibliothèque mathématique. Les options `-I.` et `-Iknn -IFactorisation_matricielle` incluent les répertoires contenant les fichiers d'en-tête.
 
 ## Structure des données
 
@@ -71,7 +73,7 @@ Exemple de ligne dans `train.txt` :
 ### Lancer le serveur
 1. Exécutez le programme serveur :
    ```bash
-   ./serveur
+   make run-server
    ```
    Le serveur charge les données depuis `train.txt`, entraîne les modèles FM et KNN, et écoute sur le port 8080.
 
@@ -90,11 +92,11 @@ Exemple de ligne dans `train.txt` :
 ### Lancer le client
 1. Exécutez le programme client :
    ```bash
-   ./client
+   make run-client
    ```
    Le client envoie une requête au serveur (par exemple, pour l'utilisateur 1, 2 items, algorithme KNN) et affiche la réponse.
 
-   **Note** : L'adresse IP du serveur dans `client.c` est codée en dur (`10.2.65.107`). Modifiez-la si nécessaire pour correspondre à l'adresse de votre serveur.
+   **Note** : L'adresse IP du serveur dans `client.c` est codée en dur (`127.0.0.1`). Modifiez-la si nécessaire pour correspondre à l'adresse de votre serveur.
 
 ### Nettoyer les fichiers de test
 Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes dans `train.txt` :
@@ -149,9 +151,9 @@ Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes da
 
 ## Exemple d'utilisation
 1. Créez un fichier `train.txt` avec des transactions.
-3. Lancez le serveur : `./serveur`.
-4. Lancez le client : `./client`.
-5. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
+2. Lancez le serveur : `./serveur`.
+3. Lancez le client : `./client`.
+4. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
    ```
    Top 2 items pour l'utilisateur 1 (KNN) : 101 (4.50), 102 (4.20)
    ```
@@ -306,9 +308,9 @@ Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes da
 
 ## Exemple d'utilisation
 1. Créez un fichier `train.txt` avec des transactions.
-3. Lancez le serveur : `./serveur`.
-4. Lancez le client : `./client`.
-5. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
+2. Lancez le serveur : `./serveur`.
+3. Lancez le client : `./client`.
+4. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
    ```
    Top 2 items pour l'utilisateur 1 (KNN) : 101 (4.50), 102 (4.20)
    ```
