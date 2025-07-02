@@ -1,6 +1,6 @@
 # Variables
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -g
+#CFLAGS = -Wall -Wextra -std=c99 -g
 INCLUDES = -I. -IFactorisation_matricielle -Iknn -Igraphes -Istructures
 
 # Répertoires
