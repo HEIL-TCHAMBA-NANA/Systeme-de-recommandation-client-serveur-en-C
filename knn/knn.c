@@ -197,11 +197,10 @@ float **Predict_all(float **test_data, float **train_data, int nb_user, int nb_i
     {
         for (j = 0; j < nb_item; j++)
         {
-            if (test_data[i][j] != 0) { // Si la note est présente dans le test_data, on la predit pour tester la précision
-                user_id = i;
-                item_id = j;
-                result[i][j] = Predict(user_id, item_id, train_data, nb_user, nb_item); // On prédit la note pour l'utilisateur i et l'item j
-            }
+            user_id = i;
+            item_id = j;
+            result[i][j] = Predict(user_id, item_id, train_data, nb_user, nb_item); // On prédit la note pour l'utilisateur i et l'item j
+            
         }
     }
 
