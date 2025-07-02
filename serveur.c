@@ -33,6 +33,14 @@ int main() {
         free(donnees_entrainement);
         return 1;
     }
+    // Matrice des prediction pour KNN
+    float **matrice_complete_knn = Predict_all(matrice_entrainement_knn, matrice_entrainement_knn, nb_utilisateurs, nb_items);
+    if(!matrice_complete_knn){
+        fprintf(stderr, "Échec de la génération de la matrice de predictions\n");
+        free(matrice_entrainement_knn);
+        free(donnees_entrainement);
+        return 1;
+    }
 
     // Entraîner le modèle FM
     MF_Params parametres = {0.01, 0.1, 100};
@@ -118,7 +126,7 @@ int main() {
                 strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
                 free(top_items);
             } else if (strcmp(client_recu.algorithm, "KNN") == 0) {
-                get_top_n_recommendations(matrice_entrainement_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
+                get_top_n_recommendations(matrice_complete_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
                 char temp[256];
                 snprintf(reponse, sizeof(reponse), "Top %d items pour l'utilisateur %d (KNN) : ", N, id_utilisateur);
                 for (int i = 0; i < N && top_items[i] != -1; i++) {
