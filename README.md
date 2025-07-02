@@ -2,7 +2,7 @@
 
 ## Aperçu
 
-Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant trois algorithmes principaux : la factorisation matricielle (FM), l'algorithme des k plus proches voisins (KNN) et l'algorithme PAGERANK des GRAPHES. Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes des clients. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
+Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant trois algorithmes principaux : la factorisation matricielle (FM), l'algorithme des k plus proches voisins (KNN) et l'algorithme PAGERANK des GRAPHES. Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes de plusieurs clients simultanément. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
 
 Le projet est conçu pour être modulaire, avec des fichiers séparés pour les algorithmes (FM, KNN et GRAPHES), la gestion des données, et les composants client et serveur.
 
