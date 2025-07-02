@@ -2,7 +2,7 @@
 
 ## Aperçu
 
-Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant trois algorithmes principaux : la factorisation matricielle (FM), l'algorithme des k plus proches voisins (KNN) et l'algoeithme PAGERANK des GRAPHES. Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes des clients. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
+Ce projet est un système de recommandation implémenté en C, utilisant une architecture client-serveur. Il permet de fournir des recommandations d'items aux utilisateurs en utilisant trois algorithmes principaux : la factorisation matricielle (FM), l'algorithme des k plus proches voisins (KNN) et l'algorithme PAGERANK des GRAPHES. Le système traite des données de transactions (utilisateur, item, note, catégorie, horodatage) et utilise une communication via sockets TCP pour répondre aux requêtes des clients. Il inclut également des fonctions utilitaires pour manipuler les fichiers de données et représenter les relations entre utilisateurs et items sous forme de graphes.
 
 Le projet est conçu pour être modulaire, avec des fichiers séparés pour les algorithmes (FM, KNN et GRAPHES), la gestion des données, et les composants client et serveur.
 
@@ -16,7 +16,7 @@ Le projet est organisé en plusieurs fichiers, chacun ayant un rôle spécifique
 - **function_principale.h / function_principale.c** : Fournit des fonctions utilitaires pour charger les transactions, convertir des dates en timestamps, filtrer les transactions par période, supprimer des transactions, nettoyer les fichiers de test, et générer des top-N recommandations.
 - **knn.h / knn.c** : Implémente l'algorithme KNN, incluant la génération d'une matrice utilisateur-item, le calcul de la similarité de Pearson, la prédiction des notes, et l'évaluation de l'erreur (RMSE).
 - **factorisation_matricielle.h / factorisation_matricielle.c** : Implémente l'algorithme de factorisation matricielle, avec l'initialisation du modèle, l'entraînement par descente de gradient, la prédiction des notes, et l'évaluation (RMSE et MAE).
-- **functions.h / functions.c** : Fournit des fonctions pour représenter les données sous forme de graphes, notamment la création d'une matrice d'adjacence bipartite et la récupération des identifiants d'utilisateurs et d'items.
+- **graphers/functions.h | graphes/functions.c** : Fournit des fonctions pour représenter les données sous forme de graphes, notamment la création d'une matrice d'adjacence bipartite et la récupération des identifiants d'utilisateurs et d'items.
 - **struct_transaction.h** : Définit la structure `Transaction` utilisée pour stocker les données (user_id, item_id, rating, category_id, timestamp).
 
 ## Prérequis
@@ -65,8 +65,6 @@ Exemple de ligne dans `train.txt` :
 ```
 1 101 5 4.5 1625097600
 ```
-
-Un fichier `size.txt` est requis pour indiquer le nombre de lignes dans les fichiers de données (utilisé dans `graphes.c`).
 
 ## Utilisation
 
@@ -138,7 +136,6 @@ Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes da
 - **Extraction des identifiants** : Les fonctions `get_userIds_and_itemIds`, `get_itemsIds_per_userId`, et `get_userIds_per_itemId` permettent d'explorer les relations dans les données.
 
 ## Limitations
-- Le fichier `size.txt` doit être créé manuellement pour indiquer le nombre de lignes dans les fichiers de données.
 - L'adresse IP du serveur est codée en dur dans `client.c`.
 - Les indices négatifs dans les fichiers de données sont détectés mais peuvent causer des erreurs si non corrigés.
 - La gestion de la mémoire est robuste, mais des erreurs d'allocation peuvent survenir pour de très grands ensembles de données.
@@ -152,7 +149,6 @@ Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes da
 
 ## Exemple d'utilisation
 1. Créez un fichier `train.txt` avec des transactions.
-2. Créez un fichier `size.txt` avec le nombre de lignes de `train.txt`.
 3. Lancez le serveur : `./serveur`.
 4. Lancez le client : `./client`.
 5. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
@@ -227,8 +223,6 @@ Exemple de ligne dans `train.txt` :
 1 101 5 4.5 1625097600
 ```
 
-Un fichier `size.txt` est requis pour indiquer le nombre de lignes dans les fichiers de données (utilisé dans `graphes.c`).
-
 ## Utilisation
 
 ### Lancer le serveur
@@ -312,7 +306,6 @@ Pour nettoyer le fichier `test.txt` en supprimant les transactions présentes da
 
 ## Exemple d'utilisation
 1. Créez un fichier `train.txt` avec des transactions.
-2. Créez un fichier `size.txt` avec le nombre de lignes de `train.txt`.
 3. Lancez le serveur : `./serveur`.
 4. Lancez le client : `./client`.
 5. Le client envoie une requête (par exemple, `KNN 1 2`) et reçoit une réponse comme :
