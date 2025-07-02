@@ -286,15 +286,15 @@ int *get_userIds_per_itemId(int item_id, char *filename, int *tab){
 
 /* =========================================================================================== */
 
-float** produit_matrices(float **A, float **B, int lignesA, int colonnesA, int colonnesB) {
+float** produit_matrices(float **A, float **B, int lignesA, int colonnesA, int lignesB) {
     // A est de taille (lignesA x colonnesA)
     // B est de taille (colonnesA x colonnesB)
     // Le résultat sera de taille (lignesA x colonnesB)
 
     float **resultat = malloc(lignesA * sizeof(int *));
     for (int i = 0; i < lignesA; i++) {
-        resultat[i] = malloc(colonnesB * sizeof(int));
-        for (int j = 0; j < colonnesB; j++) {
+        resultat[i] = malloc(lignesB * sizeof(int));
+        for (int j = 0; j < lignesB; j++) {
             resultat[i][j] = 0;
             for (int k = 0; k < colonnesA; k++) {
                 resultat[i][j] += A[i][k] * B[k][j];
@@ -357,32 +357,66 @@ float** somme_matrices(float **A, float **B, int lignes, int colonnes) {
 
 /* =========================================================================================== */
 
-float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d, char *filename, int max_iter){
+float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d, char *filename){
     data file_data;
-    int size,i;
+    int size,i,j;
     float **pr_new;
-    
+    printf("\nPAGE-RANK\n");
     matrice_adjacence = get_matrice_adjascence(filename,matrice_adjacence);
+    printf("\nPAGE-1\n");
     file_data = get_userIds_and_itemIds(filename,file_data);
+    printf("\nPAGE-2\n");
     size = file_data.nbreItems+file_data.nbreUsers;
-    pr = malloc(sizeof(int*));
-    pr[0] = malloc(size*sizeof(int));
+    pr = malloc(size*sizeof(int*));
+    
     for (i = 0; i < size; i++){
-        pr[0][i] = 1/size;
+        pr[i] = malloc(sizeof(int));
+        pr[i][0] = 1/size;
     }
 
-    pr_new = produit_matrices(produit_scalaire(matrice_adjacence,size,size,alpha),pr,size,size,size);
-    d = produit_scalaire_float(d,1,size,1-alpha);
-    pr_new = somme_matrices(pr,d,1,size);
-    for (i = 0; i < max_iter; i++)
+    pr_new = malloc(size*sizeof(float*));
+    for (i = 0; i < size; i++)
     {
-        pr_new = produit_matrices(produit_scalaire(matrice_adjacence,size,size,alpha),pr,size,size,size);
-        d = produit_scalaire_float(d,1,size,1-alpha);
-        pr_new = somme_matrices(pr,d,1,size);
-
-        pr = pr_new;
+        pr_new[i] = malloc(size*sizeof(float));
+        for (j = 0; j < size; j++)
+        {
+            pr_new[i][j] = 0;
+        }
     }
     
+
+    printf("\nPAGE-3\n");
+    pr_new = produit_scalaire(matrice_adjacence,size,size,alpha);
+    printf("\nPAGE-3--1\n");
+    pr = produit_matrices(pr_new,pr,1,size,size);
+    for (i = 0; i < size; i++)
+    {
+        printf("i = %d",i);
+        printf("pr[%d] = %f\n",i,pr[0][i]);
+    }
+    printf("\nPAGE-4\n");
+    d = produit_scalaire_float(d,1,size,1-alpha);
+    printf("\nPAGE-5\n");
+    pr_new = somme_matrices(pr,d,1,size);
+    for (i = 0; i < size; i++)
+    {
+        printf("i = %d",i);
+        printf("pr[%d] = %f\n",i,pr[0][i]);
+    }
+    printf("\nPAGE-6\n");
+    /*for (i = 0; i < max_iter; i++)
+    {   
+        printf("\nBOUCLE-1\n");
+        pr = produit_scalaire_float(pr,size,1,alpha);
+        printf("\nBOUCLE-1--1\n");
+        pr = produit_matrices(pr_new,pr,size,size,size);
+        printf("\nBOUCLE-2\n");
+        d = produit_scalaire_float(d,size,1,1-alpha);
+        printf("\nBOUCLE-3\n");
+        pr = somme_matrices(pr,d,1,size);
+        printf("\nBOUCLE-4\n");
+    }*/
+    printf("\nPAGE-7\n");
 
     return pr;
 }
@@ -392,8 +426,55 @@ float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d, char 
 
 
 int main(){
+    char *filename = "data.txt";
+    data file_data;
+    int size,user_id,i;
+    float **d,**pr=NULL;
+    int **matrice_adjacence = NULL;
+    int alpha = 0.85;//max_iter = 50;
 
+    file_data = get_userIds_and_itemIds(filename,file_data);
+    size = file_data.nbreItems+file_data.nbreUsers;
+    printf("Veuillez entrer votre userID: ");
+    user_id = scanf("%d",&user_id);
+    printf("User-id-1 = %d\n",user_id);
+    user_id = 322;
+    d = malloc(size*sizeof(float*));
+    for (i = 0; i < size; i++)
+    {
+        d[i] = malloc(sizeof(float));
+        d[i][0] = 0;
+    }
+    
+    //pr[0] = malloc((size)*sizeof(float));
 
+    printf("\n--1--\n");
 
+    if (recherche_lineaire(file_data.user_ids,user_id,0,file_data.nbreUsers) == false){
+        printf("User-id = %d\n",user_id);
+        return file_data.item_ids[rand()%file_data.nbreItems];
+    }
+
+    printf("\n--2--\n");
+
+    for (i = 0; i < file_data.nbreUsers; i++)
+        if (file_data.user_ids[i] == user_id)
+            d[0][i] = 1;
+    
+    printf("\n--3--\n");
+
+    pr = pageRank(pr,matrice_adjacence,alpha,d,filename);
+
+    printf("\n--4--\n");
+
+    for (i = 0; i < size; i++)
+    {
+        printf("i = %d",i);
+        printf("pr[%d] = %f\n",i,pr[0][i]);
+    }
+
+    printf("\n--5--\n");
+    
+    
     return 0;
 }
