@@ -8,6 +8,7 @@
 
 int main() {
 
+    periodic_transaction("train.txt", "01/01/2023", "31/12/2023");
     clean_test_file("ratings.txt", "test.txt");
 
     return 0;
