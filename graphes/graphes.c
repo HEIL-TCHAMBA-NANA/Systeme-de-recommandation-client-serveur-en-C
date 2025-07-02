@@ -143,8 +143,8 @@ bool recherche_lineaire(int *array, int finded,int start, int size){
 int **get_matrice_adjascence(char *filename, int **matrice){
     data data_list;
     data_list =  get_userIds_and_itemIds(filename, data_list);
-    printf("nbreUsers=%d\n",data_list.nbreUsers);
-    printf("nbreItems=%d\n",data_list.nbreItems);
+    // printf("nbreUsers=%d\n",data_list.nbreUsers);
+    // printf("nbreItems=%d\n",data_list.nbreItems);
     int i,j=0;
     int size = data_list.nbreItems+data_list.nbreUsers;
     matrice = malloc(size*sizeof(int *));
@@ -286,42 +286,114 @@ int *get_userIds_per_itemId(int item_id, char *filename, int *tab){
 
 /* =========================================================================================== */
 
+float** produit_matrices(float **A, float **B, int lignesA, int colonnesA, int colonnesB) {
+    // A est de taille (lignesA x colonnesA)
+    // B est de taille (colonnesA x colonnesB)
+    // Le résultat sera de taille (lignesA x colonnesB)
 
-int main(void){
-    // char *filename = "data.txt";
-    // data elt;
-    // elt = get_userIds_and_itemIds(filename,elt);
-    // save **elt = NULL;
-    // elt = get_data(filename,elt,"item_id");
-    // int *tab = NULL;
-    // tab = get_itemsIds_per_userId(97,"data.txt",tab);
-    // printf("\nTaille: %d\n",tab[0]);
-    // for (int i = 1; i < tab[0]; i++)
-    // {
-    //     printf("Tab[%d]=%d -- ",i,tab[i]);
-    // }
-    // save *tmp;
-    // for (int i = 0; i < 50; i++)
-    // {   
-
-    //     tmp = elt[i];
-    //     while (tmp != NULL)
-    //     {
-    //         fprintf(stdout,"User: %d - item: %d - cat: %d -  rate: %f - date: %ld\n\n",tmp->element.user_id,tmp->element.item_id,tmp->element.category_id,tmp->element.rating,tmp->element.timestamp);
-    //         tmp = tmp->next;
-    //     }
-        
-    // }
-
-
-    int **matrice = NULL;
-    data data_list;
-    data_list =  get_userIds_and_itemIds("data.txt",data_list);
-    int taille = data_list.nbreItems+data_list.nbreUsers;
-    printf("\nMATRICE-D'AJASCENCE\n");
-    matrice = get_matrice_adjascence("data.txt",matrice);
-    printf("\nAFFICHAGE\n");
-    afficher_matrice(taille,taille,matrice);
-
+    float **resultat = malloc(lignesA * sizeof(int *));
+    for (int i = 0; i < lignesA; i++) {
+        resultat[i] = malloc(colonnesB * sizeof(int));
+        for (int j = 0; j < colonnesB; j++) {
+            resultat[i][j] = 0;
+            for (int k = 0; k < colonnesA; k++) {
+                resultat[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    return resultat;
 }
 
+
+/* =========================================================================================== */
+
+float** produit_scalaire(int **A, int lignes, int colonnes, float alpha) {
+    float **resultat = malloc(lignes * sizeof(float *));
+    for (int i = 0; i < lignes; i++) {
+        resultat[i] = malloc(colonnes * sizeof(int));
+        for (int j = 0; j < colonnes; j++) {
+            resultat[i][j] = alpha * A[i][j];
+        }
+    }
+    return resultat;
+}
+
+ float** produit_scalaire_float(float **A, int lignes, int colonnes, float alpha){
+    float **resultat = malloc(lignes * sizeof(float *));
+    for (int i = 0; i < lignes; i++) {
+        resultat[i] = malloc(colonnes * sizeof(int));
+        for (int j = 0; j < colonnes; j++) {
+            resultat[i][j] = alpha * A[i][j];
+        }
+    }
+    return resultat;
+ }
+
+
+/* =========================================================================================== */
+
+float** somme_matrices(float **A, float **B, int lignes, int colonnes) {
+    float **resultat = malloc(lignes * sizeof(int *));
+    if (resultat == NULL) {
+        perror("Erreur malloc résultat");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < lignes; i++) {
+        resultat[i] = malloc(colonnes * sizeof(int));
+        if (resultat[i] == NULL) {
+            perror("Erreur malloc ligne résultat");
+            exit(EXIT_FAILURE);
+        }
+
+        for (int j = 0; j < colonnes; j++) {
+            resultat[i][j] = A[i][j] + B[i][j];
+        }
+    }
+
+    return resultat;
+}
+
+
+/* =========================================================================================== */
+
+float **pageRank(float **pr,int **matrice_adjacence,float alpha,float **d, char *filename, int max_iter){
+    data file_data;
+    int size,i;
+    float **pr_new;
+    
+    matrice_adjacence = get_matrice_adjascence(filename,matrice_adjacence);
+    file_data = get_userIds_and_itemIds(filename,file_data);
+    size = file_data.nbreItems+file_data.nbreUsers;
+    pr = malloc(sizeof(int*));
+    pr[0] = malloc(size*sizeof(int));
+    for (i = 0; i < size; i++){
+        pr[0][i] = 1/size;
+    }
+
+    pr_new = produit_matrices(produit_scalaire(matrice_adjacence,size,size,alpha),pr,size,size,size);
+    d = produit_scalaire_float(d,1,size,1-alpha);
+    pr_new = somme_matrices(pr,d,1,size);
+    for (i = 0; i < max_iter; i++)
+    {
+        pr_new = produit_matrices(produit_scalaire(matrice_adjacence,size,size,alpha),pr,size,size,size);
+        d = produit_scalaire_float(d,1,size,1-alpha);
+        pr_new = somme_matrices(pr,d,1,size);
+
+        pr = pr_new;
+    }
+    
+
+    return pr;
+}
+
+
+/* =========================================================================================== */
+
+
+int main(){
+
+
+
+    return 0;
+}
