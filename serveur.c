@@ -40,7 +40,7 @@ int main() {
     float **matrice_complete_fm = MF(donnees_entrainement, nb_transactions_entrainement, &parametres, nb_utilisateurs, nb_items, k);
     if (!matrice_complete_fm) {
         fprintf(stderr, "Échec de la factorisation matricielle\n");
-        liberer_matrice(matrice_entrainement_knn, nb_utilisateurs);
+        free_full_matrix(matrice_entrainement_knn, nb_utilisateurs);
         free(donnees_entrainement);
         return 1;
     }
@@ -51,7 +51,7 @@ int main() {
     int taille_adresse = sizeof(adresse);
     if ((socket_serveur = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Échec de la création du socket");
-        liberer_matrice(matrice_entrainement_knn, nb_utilisateurs);
+        free_full_matrix(matrice_entrainement_knn, nb_utilisateurs);
         free_full_matrix(matrice_complete_fm, nb_utilisateurs);
         free(donnees_entrainement);
         return 1;
@@ -63,7 +63,7 @@ int main() {
     if (bind(socket_serveur, (struct sockaddr *)&adresse, sizeof(adresse)) < 0) {
         perror("Échec du bind");
         close(socket_serveur);
-        liberer_matrice(matrice_entrainement_knn, nb_utilisateurs);
+        free_full_matrix(matrice_entrainement_knn, nb_utilisateurs);
         free_full_matrix(matrice_complete_fm, nb_utilisateurs);
         free(donnees_entrainement);
         return 1;
@@ -72,7 +72,7 @@ int main() {
     if (listen(socket_serveur, 3) < 0) {
         perror("Échec du listen");
         close(socket_serveur);
-        liberer_matrice(matrice_entrainement_knn, nb_utilisateurs);
+        free_full_matrix(matrice_entrainement_knn, nb_utilisateurs);
         free_full_matrix(matrice_complete_fm, nb_utilisateurs);
         free(donnees_entrainement);
         return 1;
@@ -118,7 +118,7 @@ int main() {
                 strncat(reponse, "\n", sizeof(reponse) - strlen(reponse) - 1);
                 free(top_items);
             } else if (strcmp(client_recu.algorithm, "KNN") == 0) {
-                get_top_n_recommendations_knn(matrice_entrainement_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
+                get_top_n_recommendations(matrice_entrainement_knn, id_utilisateur, nb_utilisateurs, nb_items, N, top_items);
                 char temp[256];
                 snprintf(reponse, sizeof(reponse), "Top %d items pour l'utilisateur %d (KNN) : ", N, id_utilisateur);
                 for (int i = 0; i < N && top_items[i] != -1; i++) {
@@ -144,7 +144,7 @@ int main() {
     }
 
     // Nettoyage
-    liberer_matrice(matrice_entrainement_knn, nb_utilisateurs);
+    free_full_matrix(matrice_entrainement_knn, nb_utilisateurs);
     free_full_matrix(matrice_complete_fm, nb_utilisateurs);
     free(donnees_entrainement);
     close(socket_serveur);
