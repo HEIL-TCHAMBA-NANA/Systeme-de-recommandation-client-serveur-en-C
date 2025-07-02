@@ -1,4 +1,3 @@
-
 #include "function_principale.h"
 #include "structures/struct_transaction.h"
 
